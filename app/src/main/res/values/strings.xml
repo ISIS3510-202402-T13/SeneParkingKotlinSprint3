@@ -17,4 +17,6 @@
     <string name="confirm_password">Confirm password</string>
     <string name="next_button">next button</string>
     <string name="back_button">Back</string>
+    <string name="seneparking">SeneParking</string>
+    <string name="sign_up">Sign Up</string>
 </resources>

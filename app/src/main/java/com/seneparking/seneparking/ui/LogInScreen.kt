@@ -151,7 +151,7 @@ fun LogInScreen(
 
         // Create New Account Button
         Button(
-            onClick = { onSignUpButtonClicked },
+            onClick = { onSignUpButtonClicked() },
             modifier = Modifier
                 .fillMaxWidth(),
             colors = ButtonDefaults.outlinedButtonColors()) {
