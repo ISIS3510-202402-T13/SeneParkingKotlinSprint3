@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">SeneParkingKotlinS3</string>
+    <string name="company_name">SeneParking</string>
+    <string name="password">Password</string>
+    <string name="mobile_number_sign_in_hint">Mobile number or university id</string>
+    <string name="log_in">Log in</string>
+    <string name="create_new_account">Create new account</string>
+    <string name="forgotten_password">Forgotten password?</string>
+    <string name="hello_world">Hello, World!</string>
+    <string name="register">Register</string>
+    <string name="please_enter_your_info">Please enter your information to create an account</string>
+    <string name="email">Email</string>
+    <string name="first_name">First name</string>
+    <string name="mobile_number">Mobile number</string>
+    <string name="date_of_birth">Date of birth</string>
+    <string name="university_id">University ID</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="next_button">next button</string>
+    <string name="back_button">Back</string>
+</resources>
