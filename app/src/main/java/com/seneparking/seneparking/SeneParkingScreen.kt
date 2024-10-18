@@ -17,7 +17,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -29,6 +28,7 @@ import androidx.navigation.compose.rememberNavController
 import com.seneparking.seneparking.ui.AuthenticationViewModel
 import com.seneparking.seneparking.ui.LogInScreen
 import com.seneparking.seneparking.ui.SignUpScreen
+import com.seneparking.seneparking.ui.MapScreen
 
 
 /**
@@ -36,7 +36,8 @@ import com.seneparking.seneparking.ui.SignUpScreen
  */
 enum class SeneParkingScreen(@StringRes val title: Int) {
     Start(title = R.string.seneparking),
-    SignUp(title = R.string.sign_up)
+    SignUp(title = R.string.sign_up),
+    Map(title = R.string.map)
 }
 
 /**
@@ -72,7 +73,8 @@ fun SeneParkingAppBar(
 @Composable
 fun SeneParkingApp(
     viewModel: AuthenticationViewModel = viewModel(),
-    navController: NavHostController = rememberNavController()) {
+    navController: NavHostController = rememberNavController()
+) {
 
     // Get current backstack entry
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -96,24 +98,26 @@ fun SeneParkingApp(
             navController = navController,
             startDestination = SeneParkingScreen.Start.name,
             modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(innerPadding)
+                .fillMaxSize()  // Remove verticalScroll
         ) {
             composable(route = SeneParkingScreen.Start.name) {
                 LogInScreen(
-                    onLoginButtonClicked = { },
+                    modifier = Modifier.padding(innerPadding),  // Apply padding here
+                    onLoginButtonClicked = { navController.navigate(SeneParkingScreen.Map.name) },
                     onSignUpButtonClicked = { navController.navigate(SeneParkingScreen.SignUp.name) }
                 )
             }
             composable(route = SeneParkingScreen.SignUp.name) {
                 SignUpScreen(
+                    modifier = Modifier.padding(innerPadding),  // Apply padding here
                     onSignUpButtonClicked = { navController.navigate(SeneParkingScreen.Start.name) }
                 )
             }
+            composable(route = SeneParkingScreen.Map.name) {
+                MapScreen()  // No padding here to make the map fill the entire screen
+            }
         }
-
-
     }
 }
+
 

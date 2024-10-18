@@ -42,7 +42,7 @@ import com.seneparking.seneparking.ui.theme.SeneParkingTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LogInScreen(
-    onLoginButtonClicked: (Int) -> Unit,
+    onLoginButtonClicked: () -> Unit = {},
     onSignUpButtonClicked: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
@@ -129,7 +129,7 @@ fun LogInScreen(
 
         // Log In Button
         Button(
-            onClick = { /* Handle login */ },
+            onClick = { onLoginButtonClicked() },
             modifier = Modifier
                 .fillMaxWidth(),
             colors = ButtonDefaults.buttonColors()
