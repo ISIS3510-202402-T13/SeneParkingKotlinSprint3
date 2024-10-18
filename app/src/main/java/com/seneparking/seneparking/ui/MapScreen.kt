@@ -24,23 +24,8 @@ fun MapScreen() {
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(atasehir, 15f)
     }
-
-    var uiSettings by remember {
-        mutableStateOf(MapUiSettings(zoomControlsEnabled = true))
-    }
-    var properties by remember {
-        mutableStateOf(MapProperties(mapType = MapType.SATELLITE))
-    }
-
     GoogleMap(
-        modifier = Modifier.fillMaxSize(),  // Fill the entire screen
-        cameraPositionState = cameraPositionState,
-        properties = properties,
-        uiSettings = uiSettings
-    ) {
-        Marker(
-            state = MarkerState(position = atasehir),
-            title = "One Marker"
-        )
-    }
+        modifier = Modifier.fillMaxSize(),
+        cameraPositionState = cameraPositionState
+    )
 }
