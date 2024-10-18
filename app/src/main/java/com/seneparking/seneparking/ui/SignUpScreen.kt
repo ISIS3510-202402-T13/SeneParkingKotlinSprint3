@@ -1,48 +1,38 @@
 package com.seneparking.seneparking.ui
 
+import android.os.StrictMode
+import android.os.StrictMode.ThreadPolicy
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.seneparking.seneparking.R
+import org.json.JSONObject
+import java.io.OutputStream
+import java.net.HttpURLConnection
+import java.net.URL
 import java.text.SimpleDateFormat
-import java.util.Locale
-import java.util.regex.Pattern
+import java.util.*
 
 @Composable
 fun SignUpScreen(
-    onSignUpButtonClicked: () -> Unit = {}, // Define what happens when the button is clicked
+    onSignUpButtonClicked: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var firstName by remember { mutableStateOf("") }
@@ -51,6 +41,7 @@ fun SignUpScreen(
     var mobileNumber by remember { mutableStateOf("") }
     var dateOfBirth by remember { mutableStateOf("") }
     var uniandesCode by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
 
     // Error states for validation messages
     var firstNameError by remember { mutableStateOf<String?>(null) }
@@ -59,9 +50,14 @@ fun SignUpScreen(
     var mobileNumberError by remember { mutableStateOf<String?>(null) }
     var dateOfBirthError by remember { mutableStateOf<String?>(null) }
     var uniandesCodeError by remember { mutableStateOf<String?>(null) }
+    var passwordError by remember { mutableStateOf<String?>(null) }
+
+    // Ensure network requests are allowed on the main thread
+    val policy = ThreadPolicy.Builder().permitAll().build()
+    StrictMode.setThreadPolicy(policy)
 
     // Validation functions
-    val emailPattern = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")
+    val emailPattern = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")
     val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
 
     fun validateForm(): Boolean {
@@ -84,7 +80,7 @@ fun SignUpScreen(
         }
 
         // Validate Email
-        if (email.isBlank() || !emailPattern.matcher(email).matches()) {
+        if (email.isBlank() || !email.matches(emailPattern)) {
             emailError = "Invalid email format"
             isValid = false
         } else {
@@ -99,7 +95,7 @@ fun SignUpScreen(
             mobileNumberError = null
         }
 
-        // Validate Date of Birth
+        // Validate Date of Birth (DD/MM/YYYY)
         try {
             dateFormat.isLenient = false
             dateFormat.parse(dateOfBirth)
@@ -117,12 +113,64 @@ fun SignUpScreen(
             uniandesCodeError = null
         }
 
+        // Validate Password
+        if (password.isBlank()) {
+            passwordError = "Password cannot be empty"
+            isValid = false
+        } else {
+            passwordError = null
+        }
+
         return isValid
     }
+
+    // Function to send the POST request to Firestore API
+    fun createUser() {
+        val url = URL("https://firestore.googleapis.com/v1/projects/seneparking-f457b/databases/(default)/documents/users")
+        val connection = url.openConnection() as HttpURLConnection
+        connection.requestMethod = "POST"
+        connection.setRequestProperty("Content-Type", "application/json; utf-8")
+        connection.doOutput = true
+
+        // Create JSON object with the user data
+        val userData = JSONObject()
+        val fields = JSONObject()
+
+        fields.put("firstName", JSONObject().put("stringValue", firstName))
+        fields.put("lastName", JSONObject().put("stringValue", lastName))
+        fields.put("email", JSONObject().put("stringValue", email))
+        fields.put("mobileNumber", JSONObject().put("stringValue", mobileNumber))
+        fields.put("dateOfBirth", JSONObject().put("stringValue", dateOfBirth))
+        fields.put("uniandesCode", JSONObject().put("stringValue", uniandesCode))
+        fields.put("password", JSONObject().put("stringValue", password)) // Include password
+
+        userData.put("fields", fields)
+
+        try {
+            val outputStream: OutputStream = connection.outputStream
+            outputStream.write(userData.toString().toByteArray())
+            outputStream.flush()
+
+            val responseCode = connection.responseCode
+            if (responseCode == 200 || responseCode == 201) {
+                onSignUpButtonClicked() // Signup success, navigate to the next screen
+            } else {
+                // Handle errors, like displaying an error message
+            }
+        } catch (e: Exception) {
+            e.printStackTrace() // Handle the exception
+        } finally {
+            connection.disconnect()
+        }
+    }
+
+    // Enable scrolling for the whole form
+    val scrollState = rememberScrollState()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(scrollState) // Enable scrolling
             .background(Color(0xFFFF3D63))
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -132,7 +180,7 @@ fun SignUpScreen(
 
         // App Logo
         Image(
-            painter = painterResource(id = R.drawable.temp_logo), // Use your logo here
+            painter = painterResource(id = R.drawable.temp_logo),
             contentDescription = "App Logo",
             modifier = Modifier.size(80.dp),
             contentScale = ContentScale.Fit
@@ -238,13 +286,13 @@ fun SignUpScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Date of Birth Input
+        // Date of Birth Input (DD/MM/YYYY format) - regular text keyboard
         OutlinedTextField(
             value = dateOfBirth,
             onValueChange = { dateOfBirth = it },
             label = { Text("Date of birth (DD/MM/YYYY)") },
             modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text), // Use regular text keyboard
             isError = dateOfBirthError != null,
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.White,
@@ -278,13 +326,35 @@ fun SignUpScreen(
             Text(text = uniandesCodeError!!, color = Color.Red)
         }
 
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Password Input
+        OutlinedTextField(
+            value = password,
+            onValueChange = { password = it },
+            label = { Text("Password") },
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            visualTransformation = PasswordVisualTransformation(),
+            isError = passwordError != null,
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color.White,
+                unfocusedBorderColor = Color.LightGray,
+                cursorColor = Color.White,
+                focusedLabelColor = Color.White
+            )
+        )
+        if (passwordError != null) {
+            Text(text = passwordError!!, color = Color.Red)
+        }
+
         Spacer(modifier = Modifier.height(20.dp))
 
         // Register Button
         IconButton(
             onClick = {
                 if (validateForm()) {
-                    onSignUpButtonClicked() // Only proceed if form is valid
+                    createUser() // Call the function to create the user
                 }
             },
             modifier = Modifier
