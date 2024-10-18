@@ -47,8 +47,35 @@ fun LogInScreen(
     modifier: Modifier = Modifier
 ) {
 
-    var mobileNumber by remember { mutableStateOf("") }
+    var uniandesCode by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+    // Validation errors
+    var uniandesCodeError by remember { mutableStateOf<String?>(null) }
+    var passwordError by remember { mutableStateOf<String?>(null) }
+
+    // Validation function
+    fun validateForm(): Boolean {
+        var isValid = true
+
+        // Validate that uniandesCode is numeric
+        if (uniandesCode.isBlank() || !uniandesCode.all { it.isDigit() }) {
+            uniandesCodeError = "Uniandes code must be numeric"
+            isValid = false
+        } else {
+            uniandesCodeError = null
+        }
+
+        // Validate that password is not empty
+        if (password.isBlank()) {
+            passwordError = "Password cannot be empty"
+            isValid = false
+        } else {
+            passwordError = null
+        }
+
+        return isValid
+    }
 
     // Main background color
     val backgroundColor = Color(0xFFFF3D63)
@@ -93,43 +120,55 @@ fun LogInScreen(
 
         Spacer(modifier = Modifier.height(largeSpacing))
 
-        // Mobile Number or University ID Input
+        // Uniandes Code Input
         OutlinedTextField(
-            value = mobileNumber,
-            onValueChange = {mobileNumber = it},
+            value = uniandesCode,
+            onValueChange = { uniandesCode = it },
             label = { Text(stringResource(id = R.string.mobile_number_sign_in_hint)) },
             modifier = Modifier
                 .fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            isError = uniandesCodeError != null,
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
                 unfocusedBorderColor = MaterialTheme.colorScheme.secondary,
                 cursorColor = MaterialTheme.colorScheme.primary
             )
         )
+        if (uniandesCodeError != null) {
+            Text(text = uniandesCodeError!!, color = Color.Red)
+        }
 
         Spacer(modifier = Modifier.height(mediumSpacing))
 
         // Password Input
         OutlinedTextField(
             value = password,
-            onValueChange = {password = it},
+            onValueChange = { password = it },
             label = { Text(stringResource(id = R.string.password)) },
             modifier = Modifier
                 .fillMaxWidth(),
             visualTransformation = PasswordVisualTransformation(),
+            isError = passwordError != null,
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
                 unfocusedBorderColor = MaterialTheme.colorScheme.secondary,
                 cursorColor = MaterialTheme.colorScheme.primary
             )
         )
+        if (passwordError != null) {
+            Text(text = passwordError!!, color = Color.Red)
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
         // Log In Button
         Button(
-            onClick = { onLoginButtonClicked() },
+            onClick = {
+                if (validateForm()) {
+                    onLoginButtonClicked()
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth(),
             colors = ButtonDefaults.buttonColors()
@@ -154,13 +193,13 @@ fun LogInScreen(
             onClick = { onSignUpButtonClicked() },
             modifier = Modifier
                 .fillMaxWidth(),
-            colors = ButtonDefaults.outlinedButtonColors()) {
+            colors = ButtonDefaults.outlinedButtonColors()
+        ) {
             Text(stringResource(id = R.string.create_new_account))
         }
 
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable

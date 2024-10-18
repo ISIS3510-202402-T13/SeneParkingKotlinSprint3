@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,12 +15,11 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -34,20 +32,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.seneparking.seneparking.R
+import java.text.SimpleDateFormat
+import java.util.Locale
+import java.util.regex.Pattern
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpScreen(
     onSignUpButtonClicked: () -> Unit = {}, // Define what happens when the button is clicked
     modifier: Modifier = Modifier
 ) {
-
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -55,20 +52,79 @@ fun SignUpScreen(
     var dateOfBirth by remember { mutableStateOf("") }
     var uniandesCode by remember { mutableStateOf("") }
 
-    // Main background color
-    val backgroundColor = Color(0xFFFF3D63) // Match the background color of the screen in the image
+    // Error states for validation messages
+    var firstNameError by remember { mutableStateOf<String?>(null) }
+    var lastNameError by remember { mutableStateOf<String?>(null) }
+    var emailError by remember { mutableStateOf<String?>(null) }
+    var mobileNumberError by remember { mutableStateOf<String?>(null) }
+    var dateOfBirthError by remember { mutableStateOf<String?>(null) }
+    var uniandesCodeError by remember { mutableStateOf<String?>(null) }
 
-    // Padding and spacing
-    val padding = 16.dp
-    val largeSpacing = 20.dp
-    val smallSpacing = 8.dp
+    // Validation functions
+    val emailPattern = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")
+    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
 
-    // Main content
+    fun validateForm(): Boolean {
+        var isValid = true
+
+        // Validate First Name
+        if (firstName.isBlank()) {
+            firstNameError = "First name cannot be empty"
+            isValid = false
+        } else {
+            firstNameError = null
+        }
+
+        // Validate Last Name
+        if (lastName.isBlank()) {
+            lastNameError = "Last name cannot be empty"
+            isValid = false
+        } else {
+            lastNameError = null
+        }
+
+        // Validate Email
+        if (email.isBlank() || !emailPattern.matcher(email).matches()) {
+            emailError = "Invalid email format"
+            isValid = false
+        } else {
+            emailError = null
+        }
+
+        // Validate Mobile Number
+        if (mobileNumber.isBlank() || mobileNumber.length > 10 || !mobileNumber.all { it.isDigit() }) {
+            mobileNumberError = "Mobile number must be numeric and not exceed 10 digits"
+            isValid = false
+        } else {
+            mobileNumberError = null
+        }
+
+        // Validate Date of Birth
+        try {
+            dateFormat.isLenient = false
+            dateFormat.parse(dateOfBirth)
+            dateOfBirthError = null
+        } catch (e: Exception) {
+            dateOfBirthError = "Date of birth must be in format DD/MM/YYYY"
+            isValid = false
+        }
+
+        // Validate Uniandes Code
+        if (uniandesCode.isBlank() || !uniandesCode.all { it.isDigit() }) {
+            uniandesCodeError = "Uniandes code must be numeric"
+            isValid = false
+        } else {
+            uniandesCodeError = null
+        }
+
+        return isValid
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(backgroundColor)
-            .padding(padding),
+            .background(Color(0xFFFF3D63))
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
@@ -82,35 +138,23 @@ fun SignUpScreen(
             contentScale = ContentScale.Fit
         )
 
-        Spacer(modifier = Modifier.height(smallSpacing))
+        Spacer(modifier = Modifier.height(8.dp))
 
-        // App Name
         Text(
-            text = "SeneParking", // Hardcoded app name, or use a string resource
+            text = "SeneParking",
             style = MaterialTheme.typography.displayLarge,
             color = Color.White,
-            fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.height(largeSpacing))
+        Spacer(modifier = Modifier.height(20.dp))
 
-        // Register Title
         Text(
             text = "Register",
             style = MaterialTheme.typography.titleLarge,
             color = Color.White,
-            fontWeight = FontWeight.Bold
         )
 
-        // Instructions
-        Text(
-            text = "Please enter your information to create an account",
-            style = MaterialTheme.typography.bodyMedium,
-            color = Color.White,
-            modifier = Modifier.padding(vertical = smallSpacing)
-        )
-
-        Spacer(modifier = Modifier.height(smallSpacing))
+        Spacer(modifier = Modifier.height(8.dp))
 
         // First Name Input
         OutlinedTextField(
@@ -118,15 +162,19 @@ fun SignUpScreen(
             onValueChange = { firstName = it },
             label = { Text("First name") },
             modifier = Modifier.fillMaxWidth(),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
+            isError = firstNameError != null,
+            colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.White,
                 unfocusedBorderColor = Color.LightGray,
                 cursorColor = Color.White,
                 focusedLabelColor = Color.White
             )
         )
+        if (firstNameError != null) {
+            Text(text = firstNameError!!, color = Color.Red)
+        }
 
-        Spacer(modifier = Modifier.height(smallSpacing))
+        Spacer(modifier = Modifier.height(8.dp))
 
         // Last Name Input
         OutlinedTextField(
@@ -134,15 +182,19 @@ fun SignUpScreen(
             onValueChange = { lastName = it },
             label = { Text("Last name") },
             modifier = Modifier.fillMaxWidth(),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
+            isError = lastNameError != null,
+            colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.White,
                 unfocusedBorderColor = Color.LightGray,
                 cursorColor = Color.White,
                 focusedLabelColor = Color.White
             )
         )
+        if (lastNameError != null) {
+            Text(text = lastNameError!!, color = Color.Red)
+        }
 
-        Spacer(modifier = Modifier.height(smallSpacing))
+        Spacer(modifier = Modifier.height(8.dp))
 
         // Email Input
         OutlinedTextField(
@@ -151,15 +203,19 @@ fun SignUpScreen(
             label = { Text("Email") },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
+            isError = emailError != null,
+            colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.White,
                 unfocusedBorderColor = Color.LightGray,
                 cursorColor = Color.White,
                 focusedLabelColor = Color.White
             )
         )
+        if (emailError != null) {
+            Text(text = emailError!!, color = Color.Red)
+        }
 
-        Spacer(modifier = Modifier.height(smallSpacing))
+        Spacer(modifier = Modifier.height(8.dp))
 
         // Mobile Number Input
         OutlinedTextField(
@@ -168,32 +224,40 @@ fun SignUpScreen(
             label = { Text("Mobile number") },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
+            isError = mobileNumberError != null,
+            colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.White,
                 unfocusedBorderColor = Color.LightGray,
                 cursorColor = Color.White,
                 focusedLabelColor = Color.White
             )
         )
+        if (mobileNumberError != null) {
+            Text(text = mobileNumberError!!, color = Color.Red)
+        }
 
-        Spacer(modifier = Modifier.height(smallSpacing))
+        Spacer(modifier = Modifier.height(8.dp))
 
         // Date of Birth Input
         OutlinedTextField(
             value = dateOfBirth,
             onValueChange = { dateOfBirth = it },
-            label = { Text("Date of birth") },
+            label = { Text("Date of birth (DD/MM/YYYY)") },
             modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), // You can enhance it to a date picker if needed
-            colors = TextFieldDefaults.outlinedTextFieldColors(
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            isError = dateOfBirthError != null,
+            colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.White,
                 unfocusedBorderColor = Color.LightGray,
                 cursorColor = Color.White,
                 focusedLabelColor = Color.White
             )
         )
+        if (dateOfBirthError != null) {
+            Text(text = dateOfBirthError!!, color = Color.Red)
+        }
 
-        Spacer(modifier = Modifier.height(smallSpacing))
+        Spacer(modifier = Modifier.height(8.dp))
 
         // Uniandes Code Input
         OutlinedTextField(
@@ -201,38 +265,36 @@ fun SignUpScreen(
             onValueChange = { uniandesCode = it },
             label = { Text("Uniandes code") },
             modifier = Modifier.fillMaxWidth(),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            isError = uniandesCodeError != null,
+            colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.White,
                 unfocusedBorderColor = Color.LightGray,
                 cursorColor = Color.White,
                 focusedLabelColor = Color.White
             )
         )
+        if (uniandesCodeError != null) {
+            Text(text = uniandesCodeError!!, color = Color.Red)
+        }
 
-        Spacer(modifier = Modifier.height(largeSpacing))
+        Spacer(modifier = Modifier.height(20.dp))
 
-        // "By continuing" disclaimer
-        Text(
-            text = "By continuing, you agree to our\nTerms of Service and Privacy Policy.",
-            style = MaterialTheme.typography.bodySmall,
-            color = Color.White,
-            modifier = Modifier.padding(vertical = smallSpacing),
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(largeSpacing))
-
-        // Register Button with Icon
+        // Register Button
         IconButton(
-            onClick = { onSignUpButtonClicked() },
+            onClick = {
+                if (validateForm()) {
+                    onSignUpButtonClicked() // Only proceed if form is valid
+                }
+            },
             modifier = Modifier
                 .size(56.dp)
-                .background(Color.White, shape = CircleShape) // Optional for round button
+                .background(Color.White, shape = CircleShape)
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                 contentDescription = "Go forward",
-                tint = Color.Red // Set the icon color to red, you can change this
+                tint = Color.Red
             )
         }
     }
