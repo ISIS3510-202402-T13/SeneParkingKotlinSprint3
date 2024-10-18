@@ -68,5 +68,15 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    implementation(libs.maps.compose)
+    implementation(libs.maps.compose)                   // Google Maps Compose
+    implementation(libs.play.services.maps)             // Google Play Services Maps
+    implementation(libs.play.services.location)          // Google Play Services Location
+    implementation(libs.ui)                             // Jetpack Compose UI
+    implementation(libs.material3)                       // Jetpack Compose Material 3
+    implementation(libs.ui.tooling.preview)             // Jetpack Compose Tooling Preview
+    implementation(libs.androidx.runtime.livedata)      // LiveData support for Compose
+    implementation(libs.accompanist.permissions)         // Accompanist Permissions library
+
+
+
 }
