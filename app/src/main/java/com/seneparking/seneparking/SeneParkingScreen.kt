@@ -33,6 +33,7 @@ import com.seneparking.seneparking.ui.AuthenticationViewModel
 import com.seneparking.seneparking.ui.LogInScreen
 import com.seneparking.seneparking.ui.SignUpScreen
 import com.seneparking.seneparking.ui.MapScreen
+import dagger.hilt.android.HiltAndroidApp
 
 
 /**
@@ -74,6 +75,7 @@ fun SeneParkingAppBar(
         }
     )
 }
+
 
 @Composable
 fun SeneParkingApp(

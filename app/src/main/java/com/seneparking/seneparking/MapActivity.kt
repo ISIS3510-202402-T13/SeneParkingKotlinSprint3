@@ -176,7 +176,7 @@ fun MainScreen(currentPosition: LatLng, cameraState: CameraPositionState) {
         cameraPositionState = cameraState,
         properties = MapProperties(
             isMyLocationEnabled = true,
-            mapType = MapType.HYBRID,
+            mapType = MapType.NORMAL,
             isTrafficEnabled = true
         )
     ) {
