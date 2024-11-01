@@ -31,6 +31,7 @@ import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.sp
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -229,15 +230,17 @@ fun SignUpScreen(
             label = { Text("First name") },
             modifier = Modifier.fillMaxWidth(),
             isError = firstNameError != null,
-            colors = OutlinedTextFieldDefaults.colors(
+            colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = Color.White,
                 unfocusedBorderColor = Color.LightGray,
                 cursorColor = Color.White,
-                focusedLabelColor = Color.White
+                focusedLabelColor = Color.White,
+                containerColor = Color.White,
+                errorContainerColor = Color.White
             )
         )
         if (firstNameError != null) {
-            Text(text = firstNameError!!, color = Color.Black)
+            Text(text = firstNameError!!, color = Color.White)
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -249,15 +252,17 @@ fun SignUpScreen(
             label = { Text("Last name") },
             modifier = Modifier.fillMaxWidth(),
             isError = lastNameError != null,
-            colors = OutlinedTextFieldDefaults.colors(
+            colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = Color.White,
                 unfocusedBorderColor = Color.LightGray,
                 cursorColor = Color.White,
-                focusedLabelColor = Color.White
+                focusedLabelColor = Color.White,
+                containerColor = Color.White,
+                errorContainerColor = Color.White
             )
         )
         if (lastNameError != null) {
-            Text(text = lastNameError!!, color = Color.Black)
+            Text(text = lastNameError!!, color = Color.White)
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -270,15 +275,17 @@ fun SignUpScreen(
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             isError = emailError != null,
-            colors = OutlinedTextFieldDefaults.colors(
+            colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = Color.White,
                 unfocusedBorderColor = Color.LightGray,
                 cursorColor = Color.White,
-                focusedLabelColor = Color.White
+                focusedLabelColor = Color.White,
+                containerColor = Color.White,
+                errorContainerColor = Color.White
             )
         )
         if (emailError != null) {
-            Text(text = emailError!!, color = Color.Black)
+            Text(text = emailError!!, color = Color.White)
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -291,15 +298,17 @@ fun SignUpScreen(
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             isError = mobileNumberError != null,
-            colors = OutlinedTextFieldDefaults.colors(
+            colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = Color.White,
                 unfocusedBorderColor = Color.LightGray,
                 cursorColor = Color.White,
-                focusedLabelColor = Color.White
+                focusedLabelColor = Color.White,
+                containerColor = Color.White,
+                errorContainerColor = Color.White
             )
         )
         if (mobileNumberError != null) {
-            Text(text = mobileNumberError!!, color = Color.Black)
+            Text(text = mobileNumberError!!, color = Color.White)
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -313,16 +322,18 @@ fun SignUpScreen(
                 .fillMaxWidth()
                 .clickable { datePickerDialog.show() }, // Show DatePickerDialog on click
             isError = dateOfBirthError != null,
-            colors = OutlinedTextFieldDefaults.colors(
+            colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = Color.White,
                 unfocusedBorderColor = Color.LightGray,
                 cursorColor = Color.White,
-                focusedLabelColor = Color.White
+                focusedLabelColor = Color.White,
+                containerColor = Color.White,
+                errorContainerColor = Color.White
             ),
             readOnly = true // Make field read-only to prevent manual typing
         )
         if (dateOfBirthError != null) {
-            Text(text = dateOfBirthError!!, color = Color.Black)
+            Text(text = dateOfBirthError!!, color = Color.White)
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -335,15 +346,17 @@ fun SignUpScreen(
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             isError = uniandesCodeError != null,
-            colors = OutlinedTextFieldDefaults.colors(
+            colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = Color.White,
                 unfocusedBorderColor = Color.LightGray,
                 cursorColor = Color.White,
-                focusedLabelColor = Color.White
+                focusedLabelColor = Color.White,
+                containerColor = Color.White,
+                errorContainerColor = Color.White
             )
         )
         if (uniandesCodeError != null) {
-            Text(text = uniandesCodeError!!, color = Color.Black)
+            Text(text = uniandesCodeError!!, color = Color.White)
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -357,16 +370,29 @@ fun SignUpScreen(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             visualTransformation = PasswordVisualTransformation(),
             isError = passwordError != null,
-            colors = OutlinedTextFieldDefaults.colors(
+            colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = Color.White,
                 unfocusedBorderColor = Color.LightGray,
                 cursorColor = Color.White,
-                focusedLabelColor = Color.White
+                focusedLabelColor = Color.White,
+                containerColor = Color.White,
+                errorContainerColor = Color.White
             )
         )
         if (passwordError != null) {
-            Text(text = passwordError!!, color = Color.Black)
+            Text(text = passwordError!!, color = Color.White)
         }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Disclaimer Text
+        Text(
+            text = "By continuing, you agree to our Terms of Service and Privacy Policy.",
+            color = Color.White,
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.padding(horizontal = 16.dp),
+            lineHeight = 18.sp
+        )
 
         Spacer(modifier = Modifier.height(20.dp))
 

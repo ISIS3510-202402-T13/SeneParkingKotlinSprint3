@@ -6,6 +6,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.seneparking.seneparking.ui.theme.SeneParkingTheme
+import androidx.core.content.ContextCompat
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -16,7 +18,7 @@ class MainActivity : ComponentActivity() {
                 SeneParkingApp()
             }
         }
-
+        window.statusBarColor = ContextCompat.getColor(this, R.color.colorPrimaryDark)
     }
 }
 
