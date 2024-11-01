@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <style name="Theme.SeneParkingKotlinS3" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Colores principales -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
 
-    <style name="Theme.SeneParkingKotlinS3" parent="android:Theme.Material.Light.NoActionBar" />
+        <!-- Color de texto de error en blanco -->
+        <item name="colorError">#FFFFFF</item>
+
+        <!-- Texto oscuro en la barra de estado si el fondo es claro -->
+        <item name="android:windowLightStatusBar">true</item>
+
+        <!-- Otros estilos opcionales -->
+        <item name="colorOnPrimary">@color/colorOnPrimary</item>
+    </style>
 </resources>
