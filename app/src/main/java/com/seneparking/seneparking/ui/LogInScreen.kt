@@ -32,6 +32,7 @@ import java.net.URL
 fun LogInScreen(
     onLoginButtonClicked: () -> Unit = {},
     onSignUpButtonClicked: () -> Unit = {},
+    onForgotPasswordClicked: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var mobileNumber by remember { mutableStateOf("") }
@@ -151,11 +152,13 @@ fun LogInScreen(
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
                 unfocusedBorderColor = MaterialTheme.colorScheme.secondary,
-                cursorColor = MaterialTheme.colorScheme.primary
+                cursorColor = MaterialTheme.colorScheme.primary,
+                containerColor = Color.White,
+                errorContainerColor = Color.White
             )
         )
         if (mobileNumberError != null) {
-            Text(text = mobileNumberError!!, color = Color.Red)
+            Text(text = mobileNumberError!!, color = Color.White)
         }
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -171,14 +174,21 @@ fun LogInScreen(
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
                 unfocusedBorderColor = MaterialTheme.colorScheme.secondary,
-                cursorColor = MaterialTheme.colorScheme.primary
+                cursorColor = MaterialTheme.colorScheme.primary,
+                containerColor = Color.White,
+                errorContainerColor = Color.White
             )
         )
         if (passwordError != null) {
-            Text(text = passwordError!!, color = Color.Red)
+            Text(text = passwordError!!, color = Color.White)
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        // Display login error
+        if (loginError != null) {
+            Text(text = loginError!!, color = Color.White)
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         // Log In Button
         Button(
@@ -191,37 +201,58 @@ fun LogInScreen(
                     }
                 }
             },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors()
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.White
+            )
         ) {
-            Text(stringResource(id = R.string.log_in))
+            Text(text = "Log in", color = Color.Red)
         }
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Display login error
-        if (loginError != null) {
-            Text(text = loginError!!, color = Color.Red)
-        }
-
         // Forgotten Password Text
         Text(
-            text = stringResource(id = R.string.forgotten_password),
-            color = MaterialTheme.colorScheme.onBackground,
+            text = "Forgot password?",
+            color = Color.White,
             fontSize = 14.sp,
-            modifier = Modifier.clickable { /* Handle forgotten password */ }
+            modifier = Modifier
+                .padding(vertical = 8.dp)
+                .clickable { onForgotPasswordClicked() }
         )
 
-        Spacer(modifier = Modifier.height(40.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         // Create New Account Button
-        Button(
+        OutlinedButton(
             onClick = { onSignUpButtonClicked() },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.outlinedButtonColors()
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp),
+            colors = ButtonDefaults.outlinedButtonColors(
+                contentColor = Color.White
+            )
         ) {
-            Text(stringResource(id = R.string.create_new_account))
+            Text("Create new account")
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = { /* Acción para este botón */ },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Blue,
+                contentColor = Color.White
+            )
+        ) {
+            Text("I'm a Parking Lot Owner")
+        }
+
     }
 }
 
