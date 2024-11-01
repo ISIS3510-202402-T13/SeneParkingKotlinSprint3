@@ -4,6 +4,7 @@ import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -29,7 +30,10 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.compose.ui.platform.LocalContext
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpScreen(
     onSignUpButtonClicked: () -> Unit = {},
@@ -58,7 +62,21 @@ fun SignUpScreen(
 
     // Validation functions
     val emailPattern = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")
+    val context = LocalContext.current
     val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+
+    // DatePickerDialog setup
+    val calendar = Calendar.getInstance()
+    val datePickerDialog = android.app.DatePickerDialog(
+        context,
+        { _, year, month, dayOfMonth ->
+            dateOfBirth = String.format("%02d/%02d/%04d", dayOfMonth, month + 1, year)
+            dateOfBirthError = null // Clear error after a valid date is selected
+        },
+        calendar.get(Calendar.YEAR),
+        calendar.get(Calendar.MONTH),
+        calendar.get(Calendar.DAY_OF_MONTH)
+    )
 
     fun validateForm(): Boolean {
         var isValid = true
@@ -219,7 +237,7 @@ fun SignUpScreen(
             )
         )
         if (firstNameError != null) {
-            Text(text = firstNameError!!, color = Color.Red)
+            Text(text = firstNameError!!, color = Color.Black)
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -239,7 +257,7 @@ fun SignUpScreen(
             )
         )
         if (lastNameError != null) {
-            Text(text = lastNameError!!, color = Color.Red)
+            Text(text = lastNameError!!, color = Color.Black)
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -260,7 +278,7 @@ fun SignUpScreen(
             )
         )
         if (emailError != null) {
-            Text(text = emailError!!, color = Color.Red)
+            Text(text = emailError!!, color = Color.Black)
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -281,7 +299,7 @@ fun SignUpScreen(
             )
         )
         if (mobileNumberError != null) {
-            Text(text = mobileNumberError!!, color = Color.Red)
+            Text(text = mobileNumberError!!, color = Color.Black)
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -291,18 +309,20 @@ fun SignUpScreen(
             value = dateOfBirth,
             onValueChange = { dateOfBirth = it },
             label = { Text("Date of birth (DD/MM/YYYY)") },
-            modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text), // Use regular text keyboard
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { datePickerDialog.show() }, // Show DatePickerDialog on click
             isError = dateOfBirthError != null,
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.White,
                 unfocusedBorderColor = Color.LightGray,
                 cursorColor = Color.White,
                 focusedLabelColor = Color.White
-            )
+            ),
+            readOnly = true // Make field read-only to prevent manual typing
         )
         if (dateOfBirthError != null) {
-            Text(text = dateOfBirthError!!, color = Color.Red)
+            Text(text = dateOfBirthError!!, color = Color.Black)
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -323,7 +343,7 @@ fun SignUpScreen(
             )
         )
         if (uniandesCodeError != null) {
-            Text(text = uniandesCodeError!!, color = Color.Red)
+            Text(text = uniandesCodeError!!, color = Color.Black)
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -345,7 +365,7 @@ fun SignUpScreen(
             )
         )
         if (passwordError != null) {
-            Text(text = passwordError!!, color = Color.Red)
+            Text(text = passwordError!!, color = Color.Black)
         }
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -364,11 +384,13 @@ fun SignUpScreen(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                 contentDescription = "Go forward",
-                tint = Color.Red
+                tint = Color.Black
             )
         }
     }
 }
+
+
 
 @Preview(showBackground = true)
 @Composable
