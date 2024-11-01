@@ -33,6 +33,13 @@ import java.util.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.sp
 
+private const val FIRST_NAME_MAX_LENGTH = 20
+private const val LAST_NAME_MAX_LENGTH = 20
+private const val EMAIL_MAX_LENGTH = 50
+private const val MOBILE_NUMBER_LENGTH = 10
+private const val UNIANDES_CODE_MIN_LENGTH = 6
+private const val UNIANDES_CODE_MAX_LENGTH = 10
+private const val PASSWORD_MAX_LENGTH = 20
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -107,7 +114,7 @@ fun SignUpScreen(
         }
 
         // Validate Mobile Number
-        if (mobileNumber.isBlank() || mobileNumber.length > 10 || !mobileNumber.all { it.isDigit() }) {
+        if (mobileNumber.length != MOBILE_NUMBER_LENGTH || !mobileNumber.all { it.isDigit() }) {
             mobileNumberError = "Mobile number must be numeric and not exceed 10 digits"
             isValid = false
         } else {
@@ -125,7 +132,7 @@ fun SignUpScreen(
         }
 
         // Validate Uniandes Code
-        if (uniandesCode.isBlank() || !uniandesCode.all { it.isDigit() }) {
+        if (uniandesCode.length !in UNIANDES_CODE_MIN_LENGTH..UNIANDES_CODE_MAX_LENGTH || !uniandesCode.all { it.isDigit() }) {
             uniandesCodeError = "Uniandes code must be numeric"
             isValid = false
         } else {
@@ -226,7 +233,7 @@ fun SignUpScreen(
         // First Name Input
         OutlinedTextField(
             value = firstName,
-            onValueChange = { firstName = it },
+            onValueChange = { if (it.length <= FIRST_NAME_MAX_LENGTH) firstName = it },
             label = { Text("First name") },
             modifier = Modifier.fillMaxWidth(),
             isError = firstNameError != null,
@@ -248,7 +255,7 @@ fun SignUpScreen(
         // Last Name Input
         OutlinedTextField(
             value = lastName,
-            onValueChange = { lastName = it },
+            onValueChange = { if (it.length <= LAST_NAME_MAX_LENGTH) lastName = it },
             label = { Text("Last name") },
             modifier = Modifier.fillMaxWidth(),
             isError = lastNameError != null,
@@ -270,7 +277,7 @@ fun SignUpScreen(
         // Email Input
         OutlinedTextField(
             value = email,
-            onValueChange = { email = it },
+            onValueChange = { if (it.length <= EMAIL_MAX_LENGTH) email = it },
             label = { Text("Email") },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -293,7 +300,7 @@ fun SignUpScreen(
         // Mobile Number Input
         OutlinedTextField(
             value = mobileNumber,
-            onValueChange = { mobileNumber = it },
+            onValueChange = { if (it.length <= MOBILE_NUMBER_LENGTH) mobileNumber = it },
             label = { Text("Mobile number") },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -341,7 +348,7 @@ fun SignUpScreen(
         // Uniandes Code Input
         OutlinedTextField(
             value = uniandesCode,
-            onValueChange = { uniandesCode = it },
+            onValueChange = { if (it.length <= UNIANDES_CODE_MAX_LENGTH) uniandesCode = it },
             label = { Text("Uniandes code") },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -364,7 +371,7 @@ fun SignUpScreen(
         // Password Input
         OutlinedTextField(
             value = password,
-            onValueChange = { password = it },
+            onValueChange = { if (it.length <= PASSWORD_MAX_LENGTH) password = it },
             label = { Text("Password") },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),

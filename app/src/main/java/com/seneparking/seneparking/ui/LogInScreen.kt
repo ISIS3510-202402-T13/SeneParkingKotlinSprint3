@@ -27,6 +27,11 @@ import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 
+private const val MOBILE_NUMBER_MAX_LENGTH = 10
+private const val PASSWORD_MAX_LENGTH = 20
+private const val MOBILE_NUMBER_EXACT_LENGTH = 10
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LogInScreen(
@@ -52,8 +57,14 @@ fun LogInScreen(
         var isValid = true
 
         // Validate that mobile number is numeric and not empty
-        if (mobileNumber.isBlank() || !mobileNumber.all { it.isDigit() }) {
-            mobileNumberError = "Mobil number must be numeric"
+        if (mobileNumber.isBlank()) {
+            mobileNumberError = "Mobile number cannot be empty"
+            isValid = false
+        } else if (!mobileNumber.all { it.isDigit() }) { 
+            mobileNumberError = "Mobile number must be numeric"
+            isValid = false
+        } else if (mobileNumber.length != MOBILE_NUMBER_EXACT_LENGTH || !mobileNumber.all { it.isDigit() }) {
+            mobileNumberError = "Mobile number must be exactly 10 digits"
             isValid = false
         } else {
             mobileNumberError = null
@@ -144,8 +155,8 @@ fun LogInScreen(
         // Mobile Number Input
         OutlinedTextField(
             value = mobileNumber,
-            onValueChange = { mobileNumber = it },
-            label = { Text("Número de móvil") },
+            onValueChange = { if (it.length <= MOBILE_NUMBER_MAX_LENGTH) mobileNumber = it },
+            label = { Text("Mobile number") },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             isError = mobileNumberError != null,
@@ -166,7 +177,7 @@ fun LogInScreen(
         // Password Input
         OutlinedTextField(
             value = password,
-            onValueChange = { password = it },
+            onValueChange = { if (it.length <= PASSWORD_MAX_LENGTH) password = it },
             label = { Text(stringResource(id = R.string.password)) },
             modifier = Modifier.fillMaxWidth(),
             visualTransformation = PasswordVisualTransformation(),
