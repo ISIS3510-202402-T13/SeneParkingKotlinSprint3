@@ -1,5 +1,6 @@
 package com.seneparking.seneparking
 
+import android.content.Intent
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -19,12 +20,15 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.android.gms.location.FusedLocationProviderClient
 import com.seneparking.seneparking.ui.AuthenticationViewModel
 import com.seneparking.seneparking.ui.LogInScreen
 import com.seneparking.seneparking.ui.SignUpScreen
@@ -51,6 +55,7 @@ fun SeneParkingAppBar(
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+
     TopAppBar(
         title = { Text(stringResource(currentScreen.title)) },
         colors = TopAppBarDefaults.mediumTopAppBarColors(
@@ -75,6 +80,7 @@ fun SeneParkingApp(
     viewModel: AuthenticationViewModel = viewModel(),
     navController: NavHostController = rememberNavController()
 ) {
+    val context = LocalContext.current
 
     // Get current backstack entry
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -103,7 +109,7 @@ fun SeneParkingApp(
             composable(route = SeneParkingScreen.Start.name) {
                 LogInScreen(
                     modifier = Modifier.padding(innerPadding),  // Apply padding here
-                    onLoginButtonClicked = { navController.navigate(SeneParkingScreen.Map.name) },
+                    onLoginButtonClicked = { context.startActivity(Intent(context, MapActivity::class.java)) },
                     onSignUpButtonClicked = { navController.navigate(SeneParkingScreen.SignUp.name) }
                 )
             }
