@@ -171,21 +171,34 @@ class MapActivity : ComponentActivity() {
 @Composable
 fun MainScreen(currentPosition: LatLng, cameraState: CameraPositionState) {
     val marker = LatLng(currentPosition.latitude, currentPosition.longitude)
-    GoogleMap(
-        modifier = Modifier.fillMaxSize(),
-        cameraPositionState = cameraState,
-        properties = MapProperties(
-            isMyLocationEnabled = true,
-            mapType = MapType.NORMAL,
-            isTrafficEnabled = true
-        )
-    ) {
-        Marker(
-            state = MarkerState(position = marker),
-            title = "MyPosition",
-            snippet = "This is a description of this Marker",
-            draggable = true
-        )
+    Box(modifier = Modifier.fillMaxSize()) {
+        GoogleMap(
+            modifier = Modifier.fillMaxSize(),
+            cameraPositionState = cameraState,
+            properties = MapProperties(
+                isMyLocationEnabled = true,
+                mapType = MapType.NORMAL,
+                isTrafficEnabled = true
+            )
+        ) {
+            Marker(
+                state = MarkerState(position = marker),
+                title = "MyPosition",
+                snippet = "This is a description of this Marker",
+                draggable = true
+            )
+        }
+
+        Button(
+            onClick = { /* Your action here */ },
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(16.dp) // Padding to give some space from the edges
+        ) {
+            Text("Go")
+        }
+
+
     }
 }
 
