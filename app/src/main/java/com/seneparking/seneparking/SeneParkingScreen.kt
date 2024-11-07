@@ -19,14 +19,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.google.android.gms.location.FusedLocationProviderClient
 import com.seneparking.seneparking.ui.AuthenticationViewModel
 import com.seneparking.seneparking.ui.ForgotPasswordScreen
 import com.seneparking.seneparking.ui.LogInScreen
 import com.seneparking.seneparking.ui.MapScreen
-import dagger.hilt.android.HiltAndroidApp
+import com.seneparking.seneparking.ui.ParkingLotOwnerSignUpScreen // Import the screen
 import com.seneparking.seneparking.ui.SignUpScreen
-
 
 /**
  * enum values that represent the screens in the app
@@ -35,7 +33,8 @@ enum class SeneParkingScreen(@StringRes val title: Int) {
     Start(title = R.string.seneparking),
     SignUp(title = R.string.sign_up),
     Map(title = R.string.map),
-    ForgotPassword(title = R.string.forgot_password)
+    ForgotPassword(title = R.string.forgot_password),
+    ParkingLotOwnerSignUp(title = R.string.parking_lot_owner_sign_up) // Add this screen to the enum
 }
 
 /**
@@ -49,7 +48,6 @@ fun SeneParkingAppBar(
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-
     TopAppBar(
         title = { Text(stringResource(currentScreen.title)) },
         colors = TopAppBarDefaults.mediumTopAppBarColors(
@@ -68,7 +66,6 @@ fun SeneParkingAppBar(
         }
     )
 }
-
 
 @Composable
 fun SeneParkingApp(
@@ -104,7 +101,8 @@ fun SeneParkingApp(
                     modifier = Modifier.padding(innerPadding),
                     onLoginButtonClicked = { context.startActivity(Intent(context, MapActivity::class.java)) },
                     onSignUpButtonClicked = { navController.navigate(SeneParkingScreen.SignUp.name) },
-                    onForgotPasswordClicked = { navController.navigate(SeneParkingScreen.ForgotPassword.name) }
+                    onForgotPasswordClicked = { navController.navigate(SeneParkingScreen.ForgotPassword.name) },
+                    onParkingLotOwnerButtonClicked = { navController.navigate(SeneParkingScreen.ParkingLotOwnerSignUp.name) } // Add navigation for parking lot owner
                 )
             }
             composable(route = SeneParkingScreen.SignUp.name) {
@@ -118,6 +116,12 @@ fun SeneParkingApp(
             }
             composable(route = SeneParkingScreen.ForgotPassword.name) {
                 ForgotPasswordScreen(onBackButtonClicked = { navController.popBackStack() })
+            }
+            composable(route = SeneParkingScreen.ParkingLotOwnerSignUp.name) { // Define the route for ParkingLotOwnerSignUpScreen
+                ParkingLotOwnerSignUpScreen(
+                    modifier = Modifier.padding(innerPadding),
+                    onRegisterButtonClicked = { navController.popBackStack() } // Return to previous screen on registration
+                )
             }
         }
     }

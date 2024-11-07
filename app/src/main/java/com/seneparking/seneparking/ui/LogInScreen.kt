@@ -31,13 +31,13 @@ private const val MOBILE_NUMBER_MAX_LENGTH = 10
 private const val PASSWORD_MAX_LENGTH = 20
 private const val MOBILE_NUMBER_EXACT_LENGTH = 10
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LogInScreen(
     onLoginButtonClicked: () -> Unit = {},
     onSignUpButtonClicked: () -> Unit = {},
     onForgotPasswordClicked: () -> Unit = {},
+    onParkingLotOwnerButtonClicked: () -> Unit = {}, // New parameter for navigation
     modifier: Modifier = Modifier
 ) {
     var mobileNumber by remember { mutableStateOf("") }
@@ -56,21 +56,19 @@ fun LogInScreen(
     fun validateForm(): Boolean {
         var isValid = true
 
-        // Validate that mobile number is numeric and not empty
         if (mobileNumber.isBlank()) {
             mobileNumberError = "Mobile number cannot be empty"
             isValid = false
-        } else if (!mobileNumber.all { it.isDigit() }) { 
+        } else if (!mobileNumber.all { it.isDigit() }) {
             mobileNumberError = "Mobile number must be numeric"
             isValid = false
-        } else if (mobileNumber.length != MOBILE_NUMBER_EXACT_LENGTH || !mobileNumber.all { it.isDigit() }) {
+        } else if (mobileNumber.length != MOBILE_NUMBER_EXACT_LENGTH) {
             mobileNumberError = "Mobile number must be exactly 10 digits"
             isValid = false
         } else {
             mobileNumberError = null
         }
 
-        // Validate that password is not empty
         if (password.isBlank()) {
             passwordError = "Password can't be empty"
             isValid = false
@@ -91,29 +89,26 @@ fun LogInScreen(
             val responseCode = connection.responseCode
 
             if (responseCode == 200) {
-                // Parse the response
                 val responseStream = connection.inputStream.bufferedReader().use { it.readText() }
                 val jsonResponse = JSONObject(responseStream)
                 val documents = jsonResponse.getJSONArray("documents")
 
-                // Iterate over the documents to find the correct user
                 for (i in 0 until documents.length()) {
                     val doc = documents.getJSONObject(i)
                     val fields = doc.getJSONObject("fields")
                     val firestoreMobileNumber = fields.getJSONObject("mobileNumber").getString("stringValue")
                     val firestorePassword = fields.getJSONObject("password").getString("stringValue")
 
-                    // Compare the mobile number and password
                     if (firestoreMobileNumber == mobileNumber && firestorePassword == password) {
                         return true // Successful login
                     }
                 }
-                false // User not found or incorrect password
+                false
             } else {
-                false // Error in the HTTP request
+                false
             }
         } catch (e: Exception) {
-            false // Any exception in making the request
+            false
         } finally {
             connection.disconnect()
         }
@@ -251,8 +246,9 @@ fun LogInScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // I'm a Parking Lot Owner Button
         Button(
-            onClick = { /* Acción para este botón */ },
+            onClick = { onParkingLotOwnerButtonClicked() }, // Trigger navigation
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
@@ -263,13 +259,12 @@ fun LogInScreen(
         ) {
             Text("I'm a Parking Lot Owner")
         }
-
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun LoginScreenPreview() {
+fun LogInScreenPreview() {
     SeneParkingTheme {
         LogInScreen(onLoginButtonClicked = {})
     }
