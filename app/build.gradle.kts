@@ -56,7 +56,7 @@ android {
 }
 
 dependencies {
-    
+
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.auth)
@@ -99,6 +99,11 @@ dependencies {
     kapt("com.google.dagger:hilt-android-compiler:2.51.1")
 
     implementation(libs.material)
+
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+
+    // optional - RxJava2 support
+    implementation("androidx.datastore:datastore-preferences-rxjava2:1.1.1")
 }
     
 
