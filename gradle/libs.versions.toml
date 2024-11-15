@@ -18,6 +18,9 @@ playServicesLocation = "21.0.1"
 accompanistBeta = "0.31.3-beta"
 mapsPlugin = "2.0.1"
 kspVersion = "1.8.10-1.0.9"
+firebaseBom = "33.1.1"
+services = "4.4.2"
+crashlytics = "3.0.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -45,7 +48,12 @@ play-services-location = { group = "com.google.android.gms", name = "play-servic
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hiltVersion"}
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hiltVersion"}
 accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanistBeta" }
-
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-crashlytics = {module = "com.google.firebase:firebase-crashlytics" }
+firebase-auth = {module = "com.google.firebase:firebase-auth-ktx" }
+firebase-firestore = {module= "com.google.firebase:firebase-firestore"}
+firebase-realtime = {module= "com.google.firebase:firebase-database-ktx"}
+firebase-config = {module = "com.google.firebase:firebase-config-ktx"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -55,4 +63,5 @@ hilt = { id = "com.google.dagger.hilt.android", version.ref ="hiltVersion" }
 maps-platform-secrets = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "mapsPlugin" }
 kotlin-android-ksp = { id = "com.google.devtools.ksp", version.ref ="kspVersion" }
 jetbrains-kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
-
+googleServices = { id = "com.google.gms.google-services", version.ref = "services"}
+crashlytics = {id= "com.google.firebase.crashlytics", version.ref = "crashlytics"}

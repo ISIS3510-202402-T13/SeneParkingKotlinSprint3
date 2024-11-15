@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.maps.platform.secrets)
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
+    alias(libs.plugins.googleServices)
+    alias(libs.plugins.crashlytics)
 
 }
 
@@ -54,6 +56,13 @@ android {
 }
 
 dependencies {
+    
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.realtime)
+    implementation(libs.firebase.config)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

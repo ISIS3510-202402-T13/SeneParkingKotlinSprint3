@@ -39,6 +39,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.seneparking.seneparking.services.context.hasLocationPermission
 import com.seneparking.seneparking.ui.theme.SeneParkingTheme
+import com.seneparking.seneparking.ui.viewmodel.ParkingLotViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -51,6 +52,10 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.seneparking.seneparking.ui.model.ParkingLot
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -169,8 +174,9 @@ class MapActivity : ComponentActivity() {
 }
 
 @Composable
-fun MainScreen(currentPosition: LatLng, cameraState: CameraPositionState) {
+fun MainScreen(currentPosition: LatLng, cameraState: CameraPositionState, parkingLotViewModel: ParkingLotViewModel = ParkingLotViewModel()) {
     val marker = LatLng(currentPosition.latitude, currentPosition.longitude)
+    val parkingLots : State<List<ParkingLot>> = parkingLotViewModel.parkingLot.collectAsState()
     Box(modifier = Modifier.fillMaxSize()) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
@@ -187,6 +193,18 @@ fun MainScreen(currentPosition: LatLng, cameraState: CameraPositionState) {
                 snippet = "This is a description of this Marker",
                 draggable = true
             )
+
+            parkingLots.value.forEach { parkingLot ->
+                val latitude = parkingLot.latitude ?: 0.0
+                val longitude = parkingLot.longitude ?: 0.0
+                val name = parkingLot.name ?: "Unknown"
+
+                Marker(
+                    state = MarkerState(position = LatLng(latitude, longitude)),
+                    title = name,
+                    icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)
+                )
+            }
         }
 
         Button(
