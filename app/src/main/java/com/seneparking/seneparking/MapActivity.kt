@@ -52,11 +52,26 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.BoxScopeInstance.align
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
+import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.seneparking.seneparking.ui.model.ParkingLot
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 
@@ -79,6 +94,8 @@ class MapActivity : ComponentActivity() {
             )
 
             val viewState by locationViewModel.viewState.collectAsStateWithLifecycle()
+
+            var isSwitchChecked by remember { mutableStateOf(false) }
 
             SeneParkingTheme {
                 Surface(
@@ -162,7 +179,9 @@ class MapActivity : ComponentActivity() {
                                         currentLoc.latitude,
                                         currentLoc.longitude
                                     ),
-                                    cameraState = cameraState
+                                    cameraState = cameraState,
+                                    isChecked = isSwitchChecked,
+                                    onCheckedChange = { isSwitchChecked = it }
                                 )
                             }
                         }
@@ -173,11 +192,26 @@ class MapActivity : ComponentActivity() {
     }
 }
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(currentPosition: LatLng, cameraState: CameraPositionState, parkingLotViewModel: ParkingLotViewModel = ParkingLotViewModel()) {
+fun MainScreen(currentPosition: LatLng, cameraState: CameraPositionState, isChecked: Boolean,
+               onCheckedChange: (Boolean) -> Unit, parkingLotViewModel: ParkingLotViewModel = ParkingLotViewModel()) {
+    val scope = rememberCoroutineScope()
+    val scaffoldState = rememberBottomSheetScaffoldState()
     val marker = LatLng(currentPosition.latitude, currentPosition.longitude)
     val parkingLots : State<List<ParkingLot>> = parkingLotViewModel.parkingLot.collectAsState()
-    Box(modifier = Modifier.fillMaxSize()) {
+    var selectedParkingLot by remember { mutableStateOf<ParkingLot?>(null) }
+
+    BottomSheetScaffold(
+        scaffoldState = scaffoldState,
+        sheetContent = {
+            selectedParkingLot?.let { parkingLot ->
+                ParkingLotDetailSheet(parkingLot)
+            }
+        },
+        sheetPeekHeight = 0.dp // Adjust as needed
+    ) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraState,
@@ -202,20 +236,27 @@ fun MainScreen(currentPosition: LatLng, cameraState: CameraPositionState, parkin
                 Marker(
                     state = MarkerState(position = LatLng(latitude, longitude)),
                     title = name,
-                    icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)
+                    icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE),
+                    onClick = {
+                        selectedParkingLot = parkingLot
+                        scope.launch {
+                            scaffoldState.bottomSheetState.expand()
+                        }
+                        true
+                    }
                 )
             }
-        }
 
-        Button(
-            onClick = { /* Your action here */ },
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(16.dp) // Padding to give some space from the edges
-        ) {
-            Text("Go")
-        }
+            Switch(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(16.dp), // Padding to give some space from the edges
+                checked = isChecked,
+                onCheckedChange = onCheckedChange
+            )
 
+
+        }
 
     }
 }
@@ -253,6 +294,21 @@ fun RationaleAlert(onDismiss: () -> Unit, onConfirm: () -> Unit) {
     }
 }
 
+@Composable
+fun ParkingLotDetailSheet(parkingLot: ParkingLot) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        Text(text = parkingLot.name ?: "Unknown")
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(text = "Name: ${parkingLot.name}")
+        Text(text = "Open Time: ${parkingLot.availableSpots}")
+        // Add more details as needed
+    }
+}
+
 private suspend fun CameraPositionState.centerOnLocation(
     location: LatLng
 ) = animate(
@@ -262,3 +318,26 @@ private suspend fun CameraPositionState.centerOnLocation(
     ),
     durationMs = 1500
 )
+
+@Composable
+fun SwitchWithIconExample() {
+    var checked by remember { mutableStateOf(true) }
+
+    Switch(
+        checked = checked,
+        onCheckedChange = {
+            checked = it
+        },
+        thumbContent = if (checked) {
+            {
+                Icon(
+                    imageVector = Icons.Filled.Check,
+                    contentDescription = null,
+                    modifier = Modifier.size(SwitchDefaults.IconSize),
+                )
+            }
+        } else {
+            null
+        }
+    )
+}
