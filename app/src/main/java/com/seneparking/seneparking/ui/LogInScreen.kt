@@ -27,6 +27,7 @@ import com.seneparking.seneparking.ui.theme.SeneParkingTheme
 import com.seneparking.seneparking.ui.utils.ConnectionBackBox
 import com.seneparking.seneparking.ui.utils.NoInternetBox
 import com.seneparking.seneparking.ui.utils.connectivityState
+import com.seneparking.seneparking.storage.LocalStorageManagement
 import kotlinx.coroutines.delay
 import org.json.JSONObject
 import java.net.HttpURLConnection
@@ -39,10 +40,11 @@ private const val MOBILE_NUMBER_EXACT_LENGTH = 10
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LogInScreen(
+    localStorageManagement: LocalStorageManagement, // Inject local storage management
     onLoginButtonClicked: () -> Unit = {},
     onSignUpButtonClicked: () -> Unit = {},
     onForgotPasswordClicked: () -> Unit = {},
-    onParkingLotOwnerButtonClicked: () -> Unit = {}, // New parameter for navigation
+    onParkingLotOwnerButtonClicked: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var mobileNumber by remember { mutableStateOf("") }
@@ -56,6 +58,17 @@ fun LogInScreen(
     // Ensure we can make network requests on the main thread
     val policy = ThreadPolicy.Builder().permitAll().build()
     StrictMode.setThreadPolicy(policy)
+
+    // Load saved user credentials (if available)
+    LaunchedEffect(Unit) {
+        localStorageManagement.getUserCredentials()?.let { credentials ->
+            val parts = credentials.split(":")
+            if (parts.size == 2) {
+                mobileNumber = parts[0]
+                password = parts[1]
+            }
+        }
+    }
 
     // Validation function
     fun validateForm(): Boolean {
@@ -105,6 +118,8 @@ fun LogInScreen(
                     val firestorePassword = fields.getJSONObject("password").getString("stringValue")
 
                     if (firestoreMobileNumber == mobileNumber && firestorePassword == password) {
+                        // Save credentials locally on successful login
+                        localStorageManagement.saveUserCredentials("$mobileNumber:$password")
                         return true // Successful login
                     }
                 }
@@ -119,7 +134,7 @@ fun LogInScreen(
         }
     }
 
-    //Connectivity
+    // Connectivity
     val connectionAvailable = connectivityState().value == ConnectionState.Available
 
     var showConnectionRestored = remember { mutableStateOf(false) }
@@ -132,7 +147,6 @@ fun LogInScreen(
         }
     }
 
-
     // Main content
     Column(
         modifier = Modifier
@@ -142,7 +156,6 @@ fun LogInScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-
         Spacer(modifier = Modifier.height(80.dp))
 
         // App Logo
@@ -167,7 +180,6 @@ fun LogInScreen(
 
         Spacer(modifier = Modifier.height(40.dp))
 
-
         // Mobile Number Input
         OutlinedTextField(
             value = mobileNumber,
@@ -175,14 +187,7 @@ fun LogInScreen(
             label = { Text("Mobile number") },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            isError = mobileNumberError != null,
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.secondary,
-                cursorColor = MaterialTheme.colorScheme.primary,
-                containerColor = Color.White,
-                errorContainerColor = Color.White
-            )
+            isError = mobileNumberError != null
         )
         if (mobileNumberError != null) {
             Text(text = mobileNumberError!!, color = Color.White)
@@ -197,22 +202,10 @@ fun LogInScreen(
             label = { Text(stringResource(id = R.string.password)) },
             modifier = Modifier.fillMaxWidth(),
             visualTransformation = PasswordVisualTransformation(),
-            isError = passwordError != null,
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.secondary,
-                cursorColor = MaterialTheme.colorScheme.primary,
-                containerColor = Color.White,
-                errorContainerColor = Color.White
-            )
+            isError = passwordError != null
         )
         if (passwordError != null) {
             Text(text = passwordError!!, color = Color.White)
-        }
-
-        // Display login error
-        if (loginError != null) {
-            Text(text = loginError!!, color = Color.White)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -231,11 +224,7 @@ fun LogInScreen(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(48.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.White,
-                disabledContainerColor = Color.Gray,
-            )
+                .height(48.dp)
         ) {
             Text(text = "Log in", color = Color.Red)
         }
@@ -252,9 +241,7 @@ fun LogInScreen(
             text = "Forgot password?",
             color = Color.White,
             fontSize = 14.sp,
-            modifier = Modifier
-                .padding(vertical = 8.dp)
-                .clickable { onForgotPasswordClicked() }
+            modifier = Modifier.clickable { onForgotPasswordClicked() }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -264,10 +251,7 @@ fun LogInScreen(
             onClick = { onSignUpButtonClicked() },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(48.dp),
-            colors = ButtonDefaults.outlinedButtonColors(
-                contentColor = Color.White
-            )
+                .height(48.dp)
         ) {
             Text("Create new account")
         }
@@ -276,14 +260,10 @@ fun LogInScreen(
 
         // I'm a Parking Lot Owner Button
         Button(
-            onClick = { onParkingLotOwnerButtonClicked() }, // Trigger navigation
+            onClick = { onParkingLotOwnerButtonClicked() },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(48.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Blue,
-                contentColor = Color.White
-            )
+                .height(48.dp)
         ) {
             Text("I'm a Parking Lot Owner")
         }
@@ -293,7 +273,11 @@ fun LogInScreen(
 @Preview(showBackground = true)
 @Composable
 fun LogInScreenPreview() {
+    val fakeLocalStorage = object : LocalStorageManagement {
+        override fun getUserCredentials() = "1234567890:password"
+        override fun saveUserCredentials(credentials: String) {}
+    }
     SeneParkingTheme {
-        LogInScreen(onLoginButtonClicked = {})
+        LogInScreen(localStorageManagement = fakeLocalStorage, onLoginButtonClicked = {})
     }
 }
