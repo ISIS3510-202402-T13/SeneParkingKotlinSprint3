@@ -22,7 +22,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.seneparking.seneparking.R
+import com.seneparking.seneparking.services.connectivity.ConnectionState
 import com.seneparking.seneparking.ui.theme.SeneParkingTheme
+import com.seneparking.seneparking.ui.utils.ConnectionBackBox
+import com.seneparking.seneparking.ui.utils.NoInternetBox
+import com.seneparking.seneparking.ui.utils.connectivityState
+import kotlinx.coroutines.delay
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
@@ -114,6 +119,20 @@ fun LogInScreen(
         }
     }
 
+    //Connectivity
+    val connectionAvailable = connectivityState().value == ConnectionState.Available
+
+    var showConnectionRestored = remember { mutableStateOf(false) }
+
+    LaunchedEffect(connectionAvailable) {
+        if (connectionAvailable) {
+            showConnectionRestored.value = true
+            delay(2000)
+            showConnectionRestored.value = false
+        }
+    }
+
+
     // Main content
     Column(
         modifier = Modifier
@@ -123,6 +142,7 @@ fun LogInScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
+
         Spacer(modifier = Modifier.height(80.dp))
 
         // App Logo
@@ -146,6 +166,7 @@ fun LogInScreen(
         )
 
         Spacer(modifier = Modifier.height(40.dp))
+
 
         // Mobile Number Input
         OutlinedTextField(
@@ -198,6 +219,7 @@ fun LogInScreen(
 
         // Log In Button
         Button(
+            enabled = connectionAvailable,
             onClick = {
                 if (validateForm()) {
                     if (loginUser(mobileNumber, password)) {
@@ -211,13 +233,19 @@ fun LogInScreen(
                 .fillMaxWidth()
                 .height(48.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.White
+                containerColor = Color.White,
+                disabledContainerColor = Color.Gray,
             )
         ) {
             Text(text = "Log in", color = Color.Red)
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(6.dp))
+
+        NoInternetBox(connectionAvailable)
+        ConnectionBackBox(showConnectionRestored.value)
+
+        Spacer(modifier = Modifier.height(6.dp))
 
         // Forgotten Password Text
         Text(
