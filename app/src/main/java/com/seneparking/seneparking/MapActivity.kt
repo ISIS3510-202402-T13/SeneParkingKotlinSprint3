@@ -29,7 +29,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,6 +38,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.seneparking.seneparking.services.context.hasLocationPermission
 import com.seneparking.seneparking.ui.theme.SeneParkingTheme
+import com.seneparking.seneparking.viewmodel.ParkingViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -51,10 +51,16 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import dagger.hilt.android.AndroidEntryPoint
+import androidx.compose.runtime.livedata.observeAsState
+import com.seneparking.seneparking.data.ParkingLot
 
 @AndroidEntryPoint
-
 class MapActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.S)
     @SuppressLint("MissingPermission")
@@ -169,8 +175,9 @@ class MapActivity : ComponentActivity() {
 }
 
 @Composable
-fun MainScreen(currentPosition: LatLng, cameraState: CameraPositionState) {
+fun MainScreen(currentPosition: LatLng, cameraState: CameraPositionState, parkingViewModel: ParkingViewModel = ParkingViewModel()) {
     val marker = LatLng(currentPosition.latitude, currentPosition.longitude)
+    val parkingLots : State<List<ParkingLot>> = parkingViewModel.parkingLot.collectAsState()
     Box(modifier = Modifier.fillMaxSize()) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
@@ -187,6 +194,18 @@ fun MainScreen(currentPosition: LatLng, cameraState: CameraPositionState) {
                 snippet = "This is a description of this Marker",
                 draggable = true
             )
+
+            parkingLots.value.forEach { parkingLot ->
+                val latitude = parkingLot.latitude ?: 0.0
+                val longitude = parkingLot.longitude ?: 0.0
+                val name = parkingLot.name ?: "Unknown"
+
+                Marker(
+                    state = MarkerState(position = LatLng(latitude, longitude)),
+                    title = name,
+                    icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE) // Set marker to blue
+                )
+            }
         }
 
         Button(

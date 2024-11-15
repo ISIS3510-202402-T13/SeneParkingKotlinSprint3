@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "914634064188",
+    "project_id": "parking-6138d",
+    "storage_bucket": "parking-6138d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:914634064188:android:e887e9cd8ec40b89985e39",
+        "android_client_info": {
+          "package_name": "com.seneparking.seneparking"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBvMFfRnfELf2uNCuT8-rXI_5uWCpBcCtU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
