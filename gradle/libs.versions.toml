@@ -18,6 +18,12 @@ playServicesLocation = "21.0.1"
 accompanistBeta = "0.31.3-beta"
 mapsPlugin = "2.0.1"
 kspVersion = "1.8.10-1.0.9"
+hiltNavigationFragment = "1.2.0"
+runtime = "1.7.5"
+firebaseBom = "33.1.1"
+services = "4.4.2"
+firebaseDatabaseKtx = "21.0.0"
+
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -28,6 +34,7 @@ androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecyc
 androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycleRuntimeKtx" }
 androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtx" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
+androidx-compose-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata" , version.ref = "runtime" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
@@ -45,12 +52,18 @@ play-services-location = { group = "com.google.android.gms", name = "play-servic
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hiltVersion"}
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hiltVersion"}
 accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanistBeta" }
-
+androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose" }
+androidx-hilt-navigation-fragment = { module = "androidx.hilt:hilt-navigation-fragment", version.ref = "hiltNavigationFragment" }
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
+firebase-crashlytics = {module = "com.google.firebase:firebase-crashlytics" }
+firebase-firestore = {module= "com.google.firebase:firebase-firestore"}
+firebase-database-ktx = { group = "com.google.firebase", name = "firebase-database-ktx", version.ref = "firebaseDatabaseKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 android-library = { id = "com.android.library", version.ref = "agp" }
+googleServices = { id = "com.google.gms.google-services", version.ref = "services" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref ="hiltVersion" }
 maps-platform-secrets = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "mapsPlugin" }
 kotlin-android-ksp = { id = "com.google.devtools.ksp", version.ref ="kspVersion" }
